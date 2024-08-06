@@ -1,0 +1,8 @@
+.text-error {
+    font-size: 13px;
+}
+
+.placeholder-small::placeholder {
+    font-size: 0.95rem;
+    /* Ajusta este valor según tus necesidades */
+}

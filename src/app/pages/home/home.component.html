@@ -1,0 +1,128 @@
+<nav class=" lg:hidden bg-white border-gray-200 dark:bg-gray-900">
+    <div class="container mx-auto flex ml-3 mt-2 ">
+        <div (click)="goBack()" class="rounded   rounded bg-gray-50  dark:bg-gray-800  p-3 max-w-xs">
+            <a>
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.9"
+                        d="m15 19-7-7 7-7" />
+                </svg>
+            </a>
+        </div>
+    </div>
+</nav>
+
+
+
+
+
+
+
+
+
+
+<div style="text-align: center;" class="mt-8">
+
+
+    <a href="#" class="flex items-center justify-center mb-10 text-4xl font-semibold ">
+        <img class="w-32 h-32 mr-2" src="assets/logo.png" alt="logo">
+    </a>
+
+    <h5 *ngIf="!mostrarTipoTurno " class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">AREAS</h5>
+    <span *ngIf="!mostrarTipoTurno" class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-40">Seleccione su area
+        para asignar su turno</span>
+
+
+    <h5 *ngIf="mostrarTipoTurno" class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">¡Gracias por Elegirnos!
+    </h5>
+    <p *ngIf="mostrarTipoTurno" class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">Elija su turno para
+        continuar.</p>
+
+
+
+
+</div>
+
+
+
+<!-- tarjetas -->
+<!-- *ngIf="!mostrarTipoTurno" -->
+<div  class="p-4 mx-auto max-w-lg">
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div *ngFor="let card of areas.data" (click)="onCardClick(card)"
+            class="flex flex-col cursor-pointer items-center justify-center rounded-lg border border-gray-200 shadow-md hover:shadow-md transition-shadow bg-white dark:bg-gray-800 p-6 transform hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-center">
+                <!-- <div class="flex justify-center items-center mb-4 w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-700">
+                    <div [innerHTML]="sanitize(card.aicon)" class="text-gray-700 dark:text-gray-300 text-2xl"></div>
+                </div> -->
+            </div>
+            <h2 class="text-md font-monospace    text-gray-800 dark:text-gray-200 mb-2 text-center">{{card.anombre}}
+            </h2>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- 
+
+<div *ngIf="mostrarTipoTurno" class="w-full p-4 text-center bg-white  sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+
+    <div class="items-center justify-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
+
+
+        <a (click)="crearUsuario()"
+            class="block w-full max-w-sm p-4  cursor-pointer bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+            <div class="inline-flex items-center justify-center">
+
+                <svg class="w-6 h-6 text-gray-800 dark:text-white mr-2 " aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="blue" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd"
+                        d="M4 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H4Zm0 6h16v6H4v-6Z"
+                        clip-rule="evenodd" />
+                    <path fill-rule="evenodd"
+                        d="M5 14a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1Zm5 0a1 1 0 0 1 1-1h5a1 1 0 1 1 0 2h-5a1 1 0 0 1-1-1Z"
+                        clip-rule="evenodd" />
+                </svg>
+
+                <p class="text-xl-start font-medium text-gray-700 dark:text-gray-400 select-none">Turno Normal</p>
+                <svg style="position: relative; left: 20px;" class="w-[22px] h-[22px] text-gray-800 dark:text-white "
+                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m9 5 7 7-7 7" />
+                </svg>
+            </div>
+        </a>
+
+        <a (click)="createTPrecencial()"
+            class="block w-full max-w-sm p-4  cursor-pointer bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+            <div class="inline-flex items-center justify-center">
+
+                <svg class="w-6 h-6 text-gray-800 dark:text-white mr-2 " aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="teal" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd"
+                        d="M4 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H4Zm0 6h16v6H4v-6Z"
+                        clip-rule="evenodd" />
+                    <path fill-rule="evenodd"
+                        d="M5 14a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1Zm5 0a1 1 0 0 1 1-1h5a1 1 0 1 1 0 2h-5a1 1 0 0 1-1-1Z"
+                        clip-rule="evenodd" />
+                </svg>
+
+                <p class="text-xl-start font-medium text-gray-700 dark:text-gray-400 select-none">Turno Presencial</p>
+                <svg style="position: relative; left: 20px;" class="w-[22px] h-[22px] text-gray-800 dark:text-white "
+                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m9 5 7 7-7 7" />
+                </svg>
+
+            </div>
+
+        </a>
+
+
+    </div>
+</div> -->

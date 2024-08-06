@@ -1,0 +1,57 @@
+.contenedor-tarjeta {
+    display: flex;
+    justify-content: center;
+    /* Centrar horizontalmente */
+}
+
+@media (min-width: 700px) {
+    .tarjeta {
+        max-width: 500px;
+        /* Ajusta el ancho a 500px */
+        width: 100%;
+        position: relative;
+        top: 30px;
+    }
+    .image {
+        position: relative;
+        top: 30px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tarjeta {
+        max-width: 500px;
+        /* Ajusta el ancho a 500px */
+        width: 100%;
+        position: relative;
+        top: 20px;
+    }
+    .image {
+        position: relative;
+        top: 30px;
+    }
+    .contenedor-tarjeta {
+        padding: 16px;
+    }
+}
+
+
+/* modal */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 49;
+    /* Debe estar debajo del modal */
+    display: none;
+    /* Oculto por defecto */
+}
+
+.modal-overlay.show {
+    display: block;
+    /* Mostrar cuando se necesita */
+}
