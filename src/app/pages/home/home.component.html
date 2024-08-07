@@ -1,6 +1,6 @@
 <nav class=" lg:hidden bg-white border-gray-200 dark:bg-gray-900">
     <div class="container mx-auto flex ml-3 mt-2 ">
-        <div (click)="goBack()" class="rounded   rounded bg-gray-50  dark:bg-gray-800  p-3 max-w-xs">
+        <div  class="rounded   rounded bg-gray-50  dark:bg-gray-800  p-3 max-w-xs">
             <a>
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                     width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@
         <img class="w-32 h-32 mr-2" src="assets/logo.png" alt="logo">
     </a>
 
-    <h5 *ngIf="!mostrarTipoTurno " class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">AREAS</h5>
+    <!-- <h5 *ngIf="!mostrarTipoTurno " class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">AREAS</h5>
     <span *ngIf="!mostrarTipoTurno" class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-40">Seleccione su area
         para asignar su turno</span>
 
@@ -36,7 +36,7 @@
     <h5 *ngIf="mostrarTipoTurno" class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">¡Gracias por Elegirnos!
     </h5>
     <p *ngIf="mostrarTipoTurno" class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-400">Elija su turno para
-        continuar.</p>
+        continuar.</p> -->
 
 
 
@@ -45,9 +45,11 @@
 
 
 
+
+
 <!-- tarjetas -->
-<!-- *ngIf="!mostrarTipoTurno" -->
-<div  class="p-4 mx-auto max-w-lg">
+
+<div *ngIf="!mostrarTurno" class="p-4 mx-auto max-w-lg">
     <div class="grid grid-cols-2 gap-4 mb-6">
         <div *ngFor="let card of areas.data" (click)="onCardClick(card)"
             class="flex flex-col cursor-pointer items-center justify-center rounded-lg border border-gray-200 shadow-md hover:shadow-md transition-shadow bg-white dark:bg-gray-800 p-6 transform hover:scale-105 transition-transform duration-300">
@@ -66,9 +68,12 @@
 
 
 
-<!-- 
 
-<div *ngIf="mostrarTipoTurno" class="w-full p-4 text-center bg-white  sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+
+
+
+
+<div *ngIf="mostrarTurno" class="w-full p-4 text-center bg-white  sm:p-8 dark:bg-gray-800 dark:border-gray-700">
 
     <div class="items-center justify-center space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
 
@@ -125,4 +130,4 @@
 
 
     </div>
-</div> -->
+</div> 

@@ -20,10 +20,10 @@ export class AgenciaService {
 
 
 
-  listaAgencia(): Observable<AgenciaModel> {
+  listaAgencia(): Observable<any> {
     this.$loading.set(true);
     let datos = this.url + 'listaAgencia';
-    return this._http.get<AgenciaModel>(datos).pipe(
+    return this._http.get(datos).pipe(
       tap(() => this.$loading.set(true)),
       finalize(() => this.$loading.set(false))
     );

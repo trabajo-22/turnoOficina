@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { UsuariosService } from '../../services/usuarios.service';
 import { UrlApi } from '../../api/url';
 import { AgenciaService } from '../../services/agencia.service';
+import { AgenciaModel } from '../../models/agencia';
 
 @Component({
   selector: 'app-login',
@@ -26,8 +27,8 @@ export class LoginComponent {
 
   private subscription: Subscription = new Subscription;
   public listData: any = [];
-   agencia: any = []
-   listaAgencia: any = []
+  agencia: any = []
+  listaAgencia: AgenciaModel[] = []
   boolUrl = false;
 
   searchForm: FormGroup;
@@ -51,8 +52,13 @@ export class LoginComponent {
   public url: string;
   id: string = '';
   alias: string = '';
-  homeUrl:any ;
-  
+  homeUrl: any;
+
+
+
+
+
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -73,48 +79,13 @@ export class LoginComponent {
 
 
 
-  
+
 
   ngOnInit(): void {
-   
-this.listaTotalAgencia()
 
-    this.route.params.subscribe(params => {
-      const url = new URL(document.location.href);
-      
-      const urll = url.href;
-      
-      this.id = params['id'];
-      this.alias = params['alias'];
-
-      localStorage.setItem('alias', JSON.stringify(this.alias));
-      localStorage.setItem('id', JSON.stringify(this.id));
+    this.listaTotalAgencia()
 
 
-
-
-
-
-
-
-
-        const a = 'matriz'
-        const i = '1'
-         
-
-
-        const verificando = `${url.origin}/login/${a}/${i}`;
-
-        // console.log('Mi url',verificando)
-        // console.log('Mi:', url)
-
-          if (urll === verificando){
-            this.listAgencia(this.alias, this.id)
-          this.boolUrl  = true;
-        } else{ 
-           this.boolUrl  = false;
-        }
-    });
 
 
   }
@@ -134,25 +105,34 @@ this.listaTotalAgencia()
   listAgencia(nombre: string, id: string): void {
     this.subscription.add(
       this.servicesAgencia.postAgencias(nombre, id).subscribe(resp => {
-       
-        if(resp.success){
+        if (resp.success) {
           this.agencia = resp.data;
-          // console.log('mis tados....: ', this.agencia)
-        } else{
-          console.log('ERROR',resp)
+         
+        } else {
+          console.log('ERROR', resp)
         }
       })
     )
   }
 
 
-  listaTotalAgencia(): void {
+
+
+
+  async listaTotalAgencia() {
     this.subscription.add(
       this.servicesAgencia.listaAgencia().subscribe(resp => {
-        this.listaAgencia = resp;
-        console.log('mis lista: ', this.listaAgencia.data)
 
-        // console.log('mis tados: ', this.listData)
+        this.listaAgencia = resp.data;
+        if (this.listaAgencia.length > 0) {
+          this.boolUrl = false;
+          for (let i = 0; i < this.listaAgencia.length; i++) {
+            this.scanear(this.listaAgencia[i].agid)
+          }
+          if(this.boolUrl == false){
+            alert("no esxte")
+          }
+        }
       })
     )
 
@@ -160,10 +140,30 @@ this.listaTotalAgencia()
 
 
 
+  async scanear(idbd: number) {
+    this.route.params.subscribe(params => {
+      const url = new URL(document.location.href);
+
+      this.id = params['id'];
+      this.alias = params['alias'];
+
+      if (this.id != null && this.id != "") {
+        if (idbd == +this.id  ) {
+          localStorage.setItem('alias', JSON.stringify(this.alias));
+          localStorage.setItem('id', JSON.stringify(this.id));
+          this.boolUrl = true;
+        }
+      }
+    });
+  }
+
+
+
+
+
 
 
   crearUsuario() {
-
 
     if (this.registerValide.invalid) {
       return;
@@ -178,28 +178,45 @@ this.listaTotalAgencia()
     };
 
     
+    
 
+
+    
     this.userServices.crearUsuari(usuario).subscribe(
       response => {
-      if (response.success) {
-        const datosCodificados = encodeURIComponent(JSON.stringify(usuario));
-        console.log('listaaaaaaCooficad', datosCodificados)
-        this.router.navigate(['/home'], { queryParams: { datos: datosCodificados } });
-        // this.router.navigate([`${this.homeUrl}`], { queryParams: { datos: datosCodificados } });
 
 
-      } else {
-        this.message = response.message; 
+        if (response.success) {
+          const usuarioString = JSON.stringify(usuario);
+          localStorage.setItem('usuario', usuarioString);
+          console.log('usuariioCrears', usuarioString)
+
+          this.router.navigate(['/home']);
+          
+
+
+
+         
+          // const datosCodificados = encodeURIComponent(JSON.stringify(usuario));
+          // console.log('listaaaaaaCooficad', datosCodificados)
+          // this.router.navigate(['/home'], { queryParams: { datos: datosCodificados } });
+          // this.router.navigate([`${this.homeUrl}`], { queryParams: { datos: datosCodificados } });
+
+
+
+
+        } else {
+          this.message = response.message;
+        }
+      },
+      error => {
+        if (error.status === 400) {
+          this.message = error.error.message; // Mensaje del servidor
+        } else {
+          this.message = 'Error en el servidor: ' + error.message;
+        }
       }
-    },
-    error => {
-      if (error.status === 400) {
-        this.message = error.error.message; // Mensaje del servidor
-      } else {
-        this.message = 'Error en el servidor: ' + error.message;
-      }
-    }
-  );
+    );
 
 
   }
@@ -272,7 +289,7 @@ this.listaTotalAgencia()
   }
 
 
-  loginP(){
+  loginP() {
     console.log()
   }
 
@@ -281,7 +298,7 @@ this.listaTotalAgencia()
   oonLogin(): void {
 
     if (this.searchForm.valid) {
-    
+
       this.isLoading = true;
       const cedula = this.searchForm.value.cedula;
 
@@ -292,24 +309,24 @@ this.listaTotalAgencia()
             if (response.success) {
               this.usuarios = response.data;
 
-              // const datosCodificados = encodeURIComponent(JSON.stringify(this.usuarios));
-              // this.router.navigate(['/home'], { queryParams: { datos: datosCodificados } });
+              const usuarioString = JSON.stringify(this.usuarios);
 
+
+              localStorage.setItem('usuario', usuarioString);
               this.router.navigate(['/home']);
 
             } else {
               this.isLoadingRegister = true;
-
               console.log(response.message);
 
             }
           },
           (error) => {
-            console.log('mi cedula',cedula )
+            console.log('mi cedula', cedula)
             this.ucedula = cedula;
             this.isLoadingRegister = true;
             this.isLoading = false;
-            console.error(error);
+         
           }
         );
       }, 700);
@@ -319,39 +336,39 @@ this.listaTotalAgencia()
 
 
 
-  onLogin(): void {
+  // onLogin(): void {
 
-    if (this.searchForm.valid) {
+  //   if (this.searchForm.valid) {
 
-      this.isLoading = true;
+  //     this.isLoading = true;
 
-      setTimeout(() => {
+  //     setTimeout(() => {
 
-        const cedula = this.searchForm.value.cedula;
-        this.auth.verificarCedula(cedula).subscribe(
-          (response) => {
-
-
-            if (response.success) {
-              this.router.navigate(['/home'])
-              console.log(response.message)
-            } else {
-              console.log(response.message)
-              this.isLoadingRegister = true;
-              // this.resultado = 'La cédula no existe.';
-            }
-            this.isLoading = false;
+  //       const cedula = this.searchForm.value.cedula;
+  //       this.auth.verificarCedula(cedula).subscribe(
+  //         (response) => {
 
 
-          },
-          (error) => {
-            console.error(error);
-          }
-        );
+  //           if (response.success) {
+  //             this.router.navigate(['/home'])
+  //             console.log(response.message)
+  //           } else {
+  //             console.log(response.message)
+  //             this.isLoadingRegister = true;
+  //             // this.resultado = 'La cédula no existe.';
+  //           }
+  //           this.isLoading = false;
 
-      }, 900)
-    }
-  }
+
+  //         },
+  //         (error) => {
+  //           console.error(error);
+  //         }
+  //       );
+
+  //     }, 900)
+  //   }
+  // }
 
 
   // if (this.searchForm.valid) {

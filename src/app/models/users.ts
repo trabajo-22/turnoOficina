@@ -1,11 +1,11 @@
 
 
 
-export interface ModelEmpresa_s {
+// export interface ModelEmpresa_s {
     
-  total: number;
-  data:  usuarioModel[];
-}
+//   total: number;
+//   data:  usuarioModel[];
+// }
 
 
 

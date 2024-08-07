@@ -3,6 +3,7 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { UrlApi } from '../api/url';
 import { finalize, Observable, tap } from 'rxjs';
 import { areaModel } from '../models/area';
+import { codigoModel } from '../models/codigo';
 
 @Injectable({
   providedIn: 'root'
@@ -28,26 +29,28 @@ export class UsuariosService {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  getNextNumber(): number {
-    this.currentNumber++;
-    console.log('llegand', this.currentNumber++)
-    return this.currentNumber;
+  getCodigo(): Observable<any> {
+    let datos = this.url + 'getCodigo';
+    return this._http.get<codigoModel>(datos)
   }
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -72,10 +75,10 @@ export class UsuariosService {
 
 
 
-  crearTurno(ucedula: any): Observable<any> {
-    console.log('DARA:', ucedula)
+  crearTurno(data: any): Observable<any> {
+    console.log('listaServicios:', data)
     let headers = new HttpHeaders().set('Content-Type', 'application/json');
-    return this._http.post(this.url + 'createTurno', ucedula, { headers: headers });
+    return this._http.post(this.url + 'createTurno', data, { headers: headers });
   }
 
 

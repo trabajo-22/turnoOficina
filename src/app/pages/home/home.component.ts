@@ -27,9 +27,8 @@ export class HomeComponent implements OnInit {
   isModalOpena = false;
 
 
-  mostrarTipoTurno = false;
-  currentNumber: string = '';
-  
+
+  NumTurno: string = '';
   miUrl: string = '';
   
 
@@ -42,9 +41,18 @@ export class HomeComponent implements OnInit {
   mostrarali: string = '';
   mostraid: string = '';
 
+
+
+  mostrarTurno = false;
+  aid: string = '';
+  agid: string = '';
+  
+  listaUsuario: any = {}
+  codigoId: any;
+  
+
   constructor(
-    @Inject(DOCUMENT) document: any,
-    private activatedRoute: ActivatedRoute,
+
     private router: Router,
     private route: ActivatedRoute, 
     private userServices: UsuariosService,
@@ -57,12 +65,17 @@ export class HomeComponent implements OnInit {
 
   
   ngOnInit(): void {
-    
+
     this.alias = JSON.parse(localStorage.getItem('alias')!);
     this.id = JSON.parse(localStorage.getItem('id')!);
+
+
+    const usuarioString = localStorage.getItem('usuario');
+    this.listaUsuario = usuarioString ? JSON.parse(usuarioString) : null;
+console.log('crearuser',this.listaUsuario)
     
     this.listArea()
-
+  
 
 
     // console.log('mostrando..', this.alias, this.id)
@@ -123,22 +136,31 @@ export class HomeComponent implements OnInit {
   }
 
 
-
   
+ 
+
+ 
+  onCardClick(card:any){
+
+
+    this.aid = card.aid.toString()
+    this.agid = card.agid.toString()
+    console.log('IDAREA', this.aid)
+    console.log('IDagencia', this.agid)
+    this.mostrarTurno = true;
+
+  }
+
+
 
 
 
   listArea(): void {
-
-    console.log('ddalias',  this.alias)
-    console.log('ddalias',  this.id)
-
-    this.subscription.add(
+      this.subscription.add(
       this.userServices.getArea(this.alias, this.id).subscribe(resp => {
         this.areas = resp
-        this.mostrarTipoTurno = true;
-        console.log('ddfhfhf', this.areas.data)
-
+        // this.mostrarTipoTurno = true;
+       console.log('Lista AREAA', this.areas.data)
       })
     )
   }
@@ -147,49 +169,23 @@ export class HomeComponent implements OnInit {
 
 
 
+  
 
-  goBack() {
-    //this.router.navigate(['../']);
-    }
+//   getCodigo(): void {
+//     this.subscription.add(
+//     this.userServices.getCodigo().subscribe(resp => {
+//       this.codigoId = resp.data.cid
+   
+//      console.log('Mi codigo......', this.codigoId)
+//     })
+//   )
+// }
+
 
 
   sanitize(iconPath: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(iconPath);
   }
-
-
-  generateNextNumber(): void {
-    const nextNumber = this.userServices.getNextNumber();
-    this.currentNumber = `CG${nextNumber.toString().padStart(2, '0')}`;
-  }
-
-
-
-  
-
-
-
-
-
- 
-
- 
-  onCardClick(card:any){
-    this.areaclick = card.aid.toString()
-    console.log('AREA', card.aid)
-    console.log('AREACLICK', this.areaclick)
-    console.log('USUARIO', this.datos)
-    console.log('USUARIO cEDULA', this.datos.ucedula)
-    this.mostrarTipoTurno = true;
-    
-  }
-
-
-
-
-
-
-
 
 
 
@@ -229,56 +225,111 @@ export class HomeComponent implements OnInit {
 
 
   crearUsuario() {
-    this.generateNextNumber()
     
-     const usuario = {
-     tcedula: this.datos.ucedula,
-      tnombres : this.datos.unombres,
-      tapellidos : this.datos.uapellidos,
-      tcorreo : this.datos.ucorreo,
+    this.subscription.add(
+      this.userServices.getCodigo().subscribe(resp => {
+        this.codigoId = resp.data.cid
+        
+        const usuario = {
+          tcedula: this.listaUsuario.ucedula,
+          tnombres : this.listaUsuario.unombres,
+          tapellidos : this.listaUsuario.uapellidos,
+          tcorreo : this.listaUsuario.ucorreo,
+          ttipoturno : 'Turno Normal',
+          idarea: this.aid,
+          idagencia: this.agid,
+          idcodigo : this.codigoId,
+        };
+      
 
-      tturno : this.currentNumber,
-      ttipoturno : 'Turno Normal',
-      idarea: this.areaclick,
-      idagencia: '1'
-    };
-   
-
-
+        console.log('cre.....', usuario)
      this.userServices.crearTurno(usuario).subscribe(response => {
       if(response.success){
-        console.log(response.message)
-        console.log(response.data)
         const datosCodificados = encodeURIComponent(JSON.stringify(response.data));
         this.router.navigate(['/descripcion'], { queryParams: { datos: datosCodificados } });
       
       }
     });
+    
+      })
+    )
+
+
+
+    
   }
+
+
+
+
+
+
+
+
+
 
 
   createTPrecencial() {
-    this.generateNextNumber()
-     const usuario = {
-     tcedula: this.datos.ucedula,
-      tnombres : this.datos.unombres,
-      tapellidos : this.datos.uapellidos,
-      tcorreo : this.datos.ucorreo,
-      tturno : this.currentNumber,
-      ttipoturno : 'Turno Presencial',
-      idarea: this.areaclick,
-      idagencia: '1'
-    };
-   
-     this.userServices.crearTurno(usuario).subscribe(response => {
-      if(response.success){
-        console.log(response.message)
-        console.log(response.data)
-        const datosCodificados = encodeURIComponent(JSON.stringify(response.data));
-        this.router.navigate(['/descripcion'], { queryParams: { datos: datosCodificados } });
-      }
+
+
+    this.subscription.add(
+      this.userServices.getCodigo().subscribe(resp => {
+        this.codigoId = resp.data.cid
+        
+        const usuario = {
+          tcedula: this.listaUsuario.ucedula,
+          tnombres : this.listaUsuario.unombres,
+          tapellidos : this.listaUsuario.uapellidos,
+          tcorreo : this.listaUsuario.ucorreo,
+          ttipoturno : 'Turno presencial',
+          idarea: this.aid,
+          idagencia: this.agid,
+          idcodigo : this.codigoId,
+        };
+         this.userServices.crearTurno(usuario).subscribe(response => {
+        if(response.success){
+          const datosCodificados = encodeURIComponent(JSON.stringify(response.data));
+          this.router.navigate(['/descripcion'], { queryParams: { datos: datosCodificados } });
+        
+        }
     });
+    
+      })
+
+
+    )
+
+
+
+
+
+
+    // const usuario = {
+    //   tcedula: this.listaUsuario.ucedula,
+    //    tnombres : this.listaUsuario.unombres,
+    //    tapellidos : this.listaUsuario.uapellidos,
+    //    tcorreo : this.listaUsuario.ucorreo,
+ 
+    //    tturno : this.NumTurno,
+    //    ttipoturno : 'Turno presencial',
+    //    idarea: this.aid,
+    //    idagencia: this.agid
+    //  };
+   
+    //  this.userServices.crearTurno(usuario).subscribe(response => {
+    //   if(response.success){
+    //     console.log(response.message)
+    //     console.log(response.data)
+    //     const datosCodificados = encodeURIComponent(JSON.stringify(response.data));
+    //     this.router.navigate(['/descripcion'], { queryParams: { datos: datosCodificados } });
+    //   }
+    // });
   }
+
+
+
+
+
 
 
 
