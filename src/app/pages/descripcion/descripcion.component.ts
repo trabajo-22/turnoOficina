@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import moment from 'moment';
+import { Location } from '@angular/common';
 @Component({
   selector: 'app-descripcion',
   standalone: true,
@@ -14,13 +15,16 @@ export class DescripcionComponent {
   datos: any = {};
   userData: any = null;
 
-  constructor( private route: ActivatedRoute, private services: AuthService, private router: Router ){}
+  constructor( 
+    private location: Location,
+    private route: ActivatedRoute, private services: AuthService, private router: Router ){}
 
-  ngOnInit(): void {
+  
+  
+  
+    ngOnInit(): void {
 
-    // this.userData = this.services.getUserData();  
-
-    this.route.queryParams.subscribe(params => {
+      this.route.queryParams.subscribe(params => {
       const datosCodificados = params['datos'];
       if (datosCodificados) {
         try {
@@ -34,10 +38,12 @@ export class DescripcionComponent {
     this.openModal()
   }
 
-  goBack() {
-    this.router.navigate(['../']);
-    }
 
+  back(): void {
+ 
+    this.location.back();
+   }
+ 
 
   formatDate(dateString: string): string {
     return moment(dateString).format('YYYY-MM-DD');

@@ -11,7 +11,7 @@
 
 export interface usuarioModel {
   uid: number,
-  ucedula: number,
+  ucedula: string,
   unombres: string,
   uapellidos: string,
   ucorreo: string,
@@ -26,7 +26,7 @@ export class usuarioModel {
 
   constructor(
     public uid: number,
-    public ucedula: number,
+    public ucedula: string,
     public unombres: string,
     public uapellidos: string,
     public ucorreo: string,

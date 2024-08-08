@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, signal, WritableSignal } from '@angular/core';
+import { finalize, Observable, tap } from 'rxjs';
 import { UrlApi } from '../api/url';
 import { usuarioModel } from '../models/users';
 
@@ -9,27 +9,25 @@ import { usuarioModel } from '../models/users';
 })
 export class AuthService {
 
-   public url: string;
-  private storage = localStorage;
-  
+  public url: string;
+  $loading: WritableSignal<boolean> = signal(false);
+
+
   constructor(private _http: HttpClient)  { 
     this.url = UrlApi.url;
   }
 
 
-  verificarCedula(cedula: string): Observable<any> {
+  login(cedula: string): Observable<any> {
+    this.$loading.set(true);
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-
-    return this._http.post(this.url + 'getlogin/' + cedula, {headers});
-
-
-    
-    // return this._http.post(`${this.url}/getlogin`, { cedula }, { headers });
+    return this._http.post(this.url + 'getlogin/' + cedula, {headers}).pipe(
+      tap(() => this.$loading.set(true)),
+      finalize(() =>this.$loading.set(false))
+    );
   }
-
-
 
 
 
@@ -41,27 +39,7 @@ export class AuthService {
 
 
   
-  login(){
 
-    localStorage.setItem('token', 'dfj344343kefer343434343c');
-    // localStorage.setItem('userData', JSON.stringify({ nombre: 'Richard Saldarriaga', email: 'juan@example.com' }));
-
-  }
   
-
-  crear(lista: any): any {
-     console.log('mis datos:', lista)
-    localStorage.setItem('userData', JSON.stringify({ cedula:lista.ucedula, nombre: lista.unombres, apellido: lista.uapellidos, email: lista.ucorreo }));
-  }
-
-
- 
- 
-
-
-  getUserData(): any {
-    const userData = this.storage.getItem('userData');
-    return userData ? JSON.parse(userData) : null;
-  }
 
 }

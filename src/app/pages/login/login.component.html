@@ -2,64 +2,90 @@
     <section class=" dark:bg-gray-900">
         <div class="flex mt-8 flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
 
-            <a href="#" class="flex mb-10 text-4xl font-semibold text-gray-900 dark:text-white">
-                <img class="w-32 h-32 mr-2" src="assets/logo.png" alt="logo">
-            </a>
+            <img class="w-32 h-32 mr-2  mb-10" src="assets/logo.png" alt="logo">
 
 
             <div class="flex flex-col items-center">
 
 
-                <h5 *ngIf="!isLoadingRegister" class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">SISTEMA DE TURNOS</h5>
-                <span *ngIf="!isLoadingRegister" class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-40">Ingrese credencial para continuar</span>
+                <h5 *ngIf="!isLoadingRegister && boolUrl" class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+                    SISTEMA DE TURNOS</h5>
+                <span *ngIf="!isLoadingRegister && boolUrl"
+                    class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-40">Ingrese credencial para
+                    continuar</span>
 
                 <!-- Para registrarse -->
-                <h5 *ngIf="isLoadingRegister" class="mb-1 text-xl font-medium text-gray-900 dark:text-white">Registrese porfavor</h5>
-                <span *ngIf="isLoadingRegister" class="text-sm text-gray-500 dark:text-gray-400 mb-4">Ingrese sus datos para continuar</span>
-
-
-                <form *ngIf="!boolUrl" class="max-w-sm mx-auto p-4">
-                    <select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                    <option selected>Seleccione agencia</option>
-                    <option value="US">Matriz</option>
-                    <option value="CA">Buena Fe</option>
-                    <option value="FR">El Empalme</option>
-                    <option value="DE">Balzar</option>
-                    <option value="DE">Paraiso la 14</option>
-                    <option value="DE">El carmen</option>
-                    <option value="DE">Pedernales</option>
-                    </select>
-                </form>
+                <h5 *ngIf="isLoadingRegister" class="mb-1 text-xl font-medium text-gray-900 dark:text-white">Registrese
+                    porfavor</h5>
+                <span *ngIf="isLoadingRegister" class="text-sm text-gray-500 dark:text-gray-400 mb-4">Ingrese sus datos
+                    para continuar</span>
 
 
 
+                <h5 *ngIf="!boolUrl" class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">SISTEMA DE TURNOS
+                </h5>
+                <span *ngIf="!boolUrl" class="mb-5 text-base text-gray-500 sm:text-lg dark:text-gray-40">Seleccione su
+                    agencia mas sercana</span>
+
+                <!-- INGRESAR EMPRESAS  -->
+                <div>
+                    <form *ngIf="!boolUrl" class="max-w-sm mx-auto p-4">
+                        <select id="countries"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            (change)="onAgenciaChange($event)">
+                            <option selected>Seleccione Agencia</option>
+                            <option *ngFor="let agencia of listaAgenciaData" [value]="agencia.agid"
+                                [attr.data-name]="agencia.agnombre">{{ agencia.agnombre }}</option>
+                        </select>
+                    </form>
+
+                </div>
 
 
 
-                <div *ngIf="!isLoadingRegister && boolUrl" class="p-4  rounded-lg border-0 shadow-lg dark:border-gray-700">
-                    <form [formGroup]="searchForm" (ngSubmit)="oonLogin()" class="space-y-4 md:space-y-6 mb-4">
+
+
+
+
+                <!-- LOGIN -->
+
+                <div *ngIf="!isLoadingRegister && boolUrl"
+                    class="p-4  rounded-lg border-0 shadow-lg dark:border-gray-700">
+                    <form [formGroup]="searchForm" (ngSubmit)="onLogin()" class="space-y-4 md:space-y-6 mb-4">
 
                         <div class="mt-5">
                             <div class="flex items-center">
-                                <input formControlName="cedula" type="text" id="cedula" class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
+                                <input formControlName="cedula" type="text" id="cedula"
+                                    class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
                                     placeholder="Identificación" required="">
 
 
-                                <button type="submit" [disabled]="searchForm.get('cedula')?.value.trim() === '' || isLoading" [ngClass]="{
+                                <button type="submit"
+                                    [disabled]="searchForm.get('cedula')?.value.trim() === '' || cargando" [ngClass]="{
                                     'text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80': !(searchForm.get('cedula')?.value.trim() === '' || isLoading),
-                                    'text-gray-500 bg-gray-200 cursor-not-allowed': searchForm.get('cedula')?.value.trim() === '' || isLoading
-                                    }" class="font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2"> 
+                                    'text-gray-500 bg-gray-200 cursor-not-allowed': searchForm.get('cedula')?.value.trim() === '' || cargando
+                                    }" class="font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2">
                                     <div class="flex items-center">
-                                    <span *ngIf="isLoading" class="mr-2">
-                                        <div role="status">
-                                            <svg aria-hidden="true" class="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                                            </svg>
-                                        <span class="sr-only">Loading...</span>
-                                        </div>
-                                    </span>
-                                    <span *ngIf="!isLoading">Buscar</span>
+                                        <span *ngIf="cargando" class="mr-2">
+                                          
+
+                                            <div role="status">
+                                                <svg aria-hidden="true"
+                                                    class="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-green-600"
+                                                    viewBox="0 0 100 101" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                    <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                                </svg>
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </span>
+                                        <span *ngIf="cargando">loading..</span>
+                                        <span *ngIf="!cargando">Buscar</span>
                                     </div>
                                 </button>
 
@@ -71,92 +97,118 @@
 
 
 
-                <div *ngIf="isLoadingRegister" class="p-6 rounded-lg shadow-lg border-0 dark:border-gray-700">
+
+
+                <!-- CREAR USUARIOS -->
+                <div *ngIf="isLoadingRegister" class="p-6 rounded-lg shadow-lg border-0 dark:border-gray-700 ">
 
                     <form [formGroup]="registerValide" (ngSubmit)="crearUsuario()" class="space-y-4 md:space-y-6">
 
-                        <div class="mt-2">
+                        <div class="mb-3 mt-2">
+                            <input id="ucedula" formControlName="ucedula" type="text"
+                                class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
+                                placeholder="Cedencial">
+                            <div
+                                *ngIf="registerValide.get('ucedula')!.invalid && registerValide.get('ucedula')!.touched">
 
-                            <div class="flex items-center">
-                                <input type="text" name="ucedula" [(ngModel)]="ucedula" formControlName="ucedula" class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
-                                    placeholder="Cedencial" required="">
+                                <span *ngIf="registerValide.get('ucedula')!.errors?.['required']"
+                                    class="text-red-600">La cédula es requerida.</span>
 
-                            </div>
 
-                            <div *ngIf="registerValide.get('ucedula')?.hasError('invalidTelefono') && (registerValide.get('ucedula')?.dirty || registerValide.get('ucedula')?.touched)" class="text-red-600">
-                                <span>Ingrese 10 digitos</span>
-                            </div>
+                                <div *ngIf="registerValide.get('ucedula')?.hasError('invalidTelefono') && (registerValide.get('ucedula')?.dirty ||
+                                 registerValide.get('ucedula')?.touched)" class="text-red-600">
+                                    <span>Ingrese 10 digitos</span>
+                                </div>
 
-                            <div *ngIf="registerValide.get('ucedula')?.hasError('required') && (registerValide.get('ucedula')?.dirty || registerValide.get('ucedula')?.touched)" class="text-red-500">
-                                Cedula oblidatorio
                             </div>
                             <div *ngIf="registerValide" class="text-red-500">
                                 {{message}}
                             </div>
-
-
                         </div>
 
 
 
 
-                        <div class="mt-3">
+
+                        <div class="mb-1">
                             <div class="flex items-center">
-                                <input type="text" name="unombres" formControlName="unombres" class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
+                                <input type="text" name="unombres" formControlName="unombres"
+                                    class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
                                     placeholder="Nombres" required="">
                             </div>
-                            <div *ngIf="registerValide.get('unombres')?.hasError('required') && (registerValide.get('unombres')?.dirty || registerValide.get('unombres')?.touched)" class="text-red-500">
+                            <div *ngIf="registerValide.get('unombres')?.hasError('required') && (registerValide.get('unombres')?.dirty || registerValide.get('unombres')?.touched)"
+                                class="text-red-500">
                                 Nombres es obligatorios
                             </div>
                         </div>
 
 
-                        <div class="mt-3">
+
+
+                        <div class="mb-1">
                             <div class="flex items-center">
-                                <input type="text" name="uapellidos" formControlName="uapellidos" class=" placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
+                                <input type="text" name="uapellidos" formControlName="uapellidos"
+                                    class=" placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
                                     placeholder="Apellidos" required="">
                             </div>
-                            <div *ngIf="registerValide.get('uapellidos')?.hasError('required') && (registerValide.get('uapellidos')?.dirty || registerValide.get('uapellidos')?.touched)" class="text-red-500">
+                            <div *ngIf="registerValide.get('uapellidos')?.hasError('required') && (registerValide.get('uapellidos')?.dirty || registerValide.get('uapellidos')?.touched)"
+                                class="text-red-500">
                                 Apellidos es obligatorios
                             </div>
                         </div>
 
 
 
-                        <div class="mt-4">
+
+                        <div class="mb-1">
                             <div class="flex items-center">
-                                <input type="email" name="ucorreo" formControlName="ucorreo" class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
+                                <input type="email" name="ucorreo" formControlName="ucorreo"
+                                    class="placeholder-small bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow"
                                     placeholder="Ingrese correo" required="">
                             </div>
-
-                            <div *ngIf="registerValide.get('ucorreo')?.hasError('email') && (registerValide.get('ucorreo')?.dirty || registerValide.get('ucorreo')?.touched)" class="text-red-500">
+                            <span *ngIf="registerValide.get('ucorreo')?.hasError('email')">Correo no válido.</span>
+                            <!-- <div *ngIf="registerValide.get('ucorreo')?.hasError('email') && (registerValide.get('ucorreo')?.dirty || registerValide.get('ucorreo')?.touched)" class="text-red-500">
                                 Correo Invalido.
-                            </div>
+                            </div> -->
 
-                            <div *ngIf="registerValide.get('ucorreo')?.hasError('required') && (registerValide.get('ucorreo')?.dirty || registerValide.get('ucorreo')?.touched)" class="text-red-500">
+                            <div *ngIf="registerValide.get('ucorreo')?.hasError('required') && (registerValide.get('ucorreo')?.dirty || registerValide.get('ucorreo')?.touched)"
+                                class="text-red-500">
                                 Correo es obligatorio
                             </div>
                         </div>
 
 
+
+
                         <div class="flex justify-end mt-4">
-                            <button type="submit" class="text-white  bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2">
-                        <div class="flex items-center">
-                            <span *ngIf="isLoadingcrear" class="mr-2">
-                                <div role="status">
-                                    <svg aria-hidden="true" class="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                                    </svg>
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-                            </span>
-                            <span *ngIf="isLoadingcrear ">Loading...</span>
-                            <span *ngIf="!isLoadingcrear">
-                                Continuar
-                            </span>
-                        </div>
-                    </button>
+                            <button type="submit"
+                                    [disabled]="registerValide.get('ucorreo')?.value.trim() === '' || cargandoCrearUser" [ngClass]="{
+                                    'text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80': !(registerValide.get('ucorreo')?.value.trim() === '' || isLoading),
+                                    'text-gray-500 bg-gray-200 cursor-not-allowed': registerValide.get('ucorreo')?.value.trim() === '' || cargandoCrearUser
+                                    }" class="font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2">
+                                    <div class="flex items-center">
+                                        <span *ngIf="cargandoCrearUser" class="mr-2">
+                                          
+
+                                            <div role="status">
+                                                <svg aria-hidden="true"
+                                                    class="inline w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600"
+                                                    viewBox="0 0 100 101" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                    <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                                </svg>
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </span>
+                                        <span *ngIf="cargandoCrearUser">loading..</span>
+                                        <span *ngIf="!cargandoCrearUser">Registrar</span>
+                                    </div>
+                                </button>
                         </div>
                     </form>
                 </div>
@@ -166,7 +218,6 @@
         </div>
     </section>
 </div>
-
 
 
 

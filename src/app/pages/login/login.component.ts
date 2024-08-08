@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
@@ -9,6 +9,7 @@ import { UsuariosService } from '../../services/usuarios.service';
 import { UrlApi } from '../../api/url';
 import { AgenciaService } from '../../services/agencia.service';
 import { AgenciaModel } from '../../models/agencia';
+import { usuarioModel } from '../../models/users';
 
 @Component({
   selector: 'app-login',
@@ -32,6 +33,7 @@ export class LoginComponent {
   boolUrl = false;
 
   searchForm: FormGroup;
+  registerValide: FormGroup;
   isLoading = false;
   isLoadingRegister = false;
   isLoadingcrear = false;
@@ -56,38 +58,66 @@ export class LoginComponent {
 
 
 
+  idagencia: string = '';
+  nombreAgencia: string = '';
+  // listaAgenciaData: string = "";
 
+  listaAgenciaData: any[] = [];
+  selectedAgenciaId: any | null = null;
+  selectedAgenciaNombre: string | null = null;
+  mostrarButton = false;
+  mostrarLogin = false;
 
 
   constructor(
+    private _formBuilder: FormBuilder,
     private fb: FormBuilder,
     private router: Router,
     private auth: AuthService,
     private userServices: UsuariosService,
     private route: ActivatedRoute,
-    private servicesAgencia: AgenciaService
+    private servicesAgencia: AgenciaService,
+
 
   ) {
     this.url = UrlApi.url;
-
     this.searchForm = this.fb.group({
       cedula: ['', [Validators.required]]
     });
 
+    this.registerValide = this._formBuilder.group({
+
+      ucedula: ['',
+        [
+          Validators.required,
+          this.telefonoValidator.bind(this)
+          // Validators.minLength(8),
+          // Validators.maxLength(11)
+        ]],
+      unombres: ['',
+        [
+          Validators.required,
+
+        ]],
+      uapellidos: ['',
+        [
+          Validators.required,
+
+        ]],
+      ucorreo: ['',
+        [
+          Validators.required,
+          Validators.email
+        ]],
+    });
   }
 
 
 
 
 
-
   ngOnInit(): void {
-
     this.listaTotalAgencia()
-
-
-
-
   }
 
 
@@ -98,7 +128,45 @@ export class LoginComponent {
 
 
 
+  listaTotalAgencias() {
+    this.servicesAgencia.listaAgencia().subscribe(
+      response => {
+        if (response.success) {
+          this.listaAgenciaData = response.data;
+        } else {
+          this.message = response.message;
+        }
+      },
+      error => {
+        if (error.status === 400) {
+          this.message = error.error.message; // Mensaje del servidor
+        } else {
+          this.message = 'Error en el servidor: ' + error.message;
+        }
+      }
+    );
+  }
 
+
+
+
+
+  onAgenciaChange(event: Event) {
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedAgenciaId = selectElement.value;
+    this.selectedAgenciaNombre = selectElement.options[selectElement.selectedIndex].getAttribute('data-name');
+
+
+    localStorage.setItem('alias', JSON.stringify(this.selectedAgenciaNombre));
+    localStorage.setItem('id', JSON.stringify(this.selectedAgenciaId));
+    this.mostrarButton = true;
+
+    this.boolUrl = true
+
+    console.log('Agencia  ID:', this.selectedAgenciaId);
+    console.log('Agencia  Nombre:', this.selectedAgenciaNombre);
+
+  }
 
 
 
@@ -107,7 +175,7 @@ export class LoginComponent {
       this.servicesAgencia.postAgencias(nombre, id).subscribe(resp => {
         if (resp.success) {
           this.agencia = resp.data;
-         
+
         } else {
           console.log('ERROR', resp)
         }
@@ -122,14 +190,15 @@ export class LoginComponent {
   async listaTotalAgencia() {
     this.subscription.add(
       this.servicesAgencia.listaAgencia().subscribe(resp => {
-
         this.listaAgencia = resp.data;
         if (this.listaAgencia.length > 0) {
           this.boolUrl = false;
           for (let i = 0; i < this.listaAgencia.length; i++) {
             this.scanear(this.listaAgencia[i].agid)
           }
-          if(this.boolUrl == false){
+          if (this.boolUrl == false) {
+            // this.boolUrl = true;
+            this.listaTotalAgencias()
             alert("no esxte")
           }
         }
@@ -137,6 +206,10 @@ export class LoginComponent {
     )
 
   }
+
+
+
+
 
 
 
@@ -148,7 +221,7 @@ export class LoginComponent {
       this.alias = params['alias'];
 
       if (this.id != null && this.id != "") {
-        if (idbd == +this.id  ) {
+        if (idbd == +this.id) {
           localStorage.setItem('alias', JSON.stringify(this.alias));
           localStorage.setItem('id', JSON.stringify(this.id));
           this.boolUrl = true;
@@ -162,60 +235,36 @@ export class LoginComponent {
 
 
 
-
   crearUsuario() {
 
     if (this.registerValide.invalid) {
       return;
     }
-
     const { ucedula, unombres, uapellidos, ucorreo } = this.registerValide.value;
-    const usuario = {
-      ucedula,
-      unombres,
-      uapellidos,
-      ucorreo
-    };
 
-    
-    
-
-
-    
-    this.userServices.crearUsuari(usuario).subscribe(
+    this.userServices.createUsuario(
+      new usuarioModel(0, ucedula, unombres, uapellidos, ucorreo, '')).subscribe(
       response => {
-
-
         if (response.success) {
-          const usuarioString = JSON.stringify(usuario);
+          // console.log('mi data', response.data)
+          const usuarioString = JSON.stringify(response.data);
           localStorage.setItem('usuario', usuarioString);
-          console.log('usuariioCrears', usuarioString)
-
           this.router.navigate(['/home']);
-          
-
-
-
-         
-          // const datosCodificados = encodeURIComponent(JSON.stringify(usuario));
-          // console.log('listaaaaaaCooficad', datosCodificados)
-          // this.router.navigate(['/home'], { queryParams: { datos: datosCodificados } });
-          // this.router.navigate([`${this.homeUrl}`], { queryParams: { datos: datosCodificados } });
-
-
-
 
         } else {
           this.message = response.message;
         }
       },
+
       error => {
         if (error.status === 400) {
-          this.message = error.error.message; // Mensaje del servidor
+          this.message = error.error.message;
         } else {
           this.message = 'Error en el servidor: ' + error.message;
         }
       }
+
+
     );
 
 
@@ -246,41 +295,6 @@ export class LoginComponent {
 
 
 
-  // crearUsuario() {
-
-  //   this.registerValide.markAllAsTouched();
-
-  //   if (this.registerValide.invalid) {
-  //     return;
-  //   }
-  //   this.userServices.crearUsuario(this.ucedula, this.unombres, this.uapellidos, this.ucorreo )
-  //   .subscribe(
-  //     (response) => {
-  //       if (response.success) {
-  //         console.log(response.message)
-  //         this.router.navigate(['/home'])
-  //       } else {
-  //         console.log(response.message)
-  //         console.log('eror front',response.messaje)
-  //       }
-  //     },
-
-  //   );
-
-  // }
-
-
-
-
-
-  registerValide = new FormGroup({
-    ucedula: new FormControl('', [Validators.required, this.telefonoValidator.bind(this)]),
-    unombres: new FormControl('', [Validators.required]),
-    uapellidos: new FormControl('', [Validators.required]),
-    ucorreo: new FormControl('', [Validators.required, Validators.email]),
-  })
-
-
 
   telefonoValidator(control: FormControl): ValidationErrors | null {
     const value = control.value;
@@ -289,51 +303,53 @@ export class LoginComponent {
   }
 
 
-  loginP() {
-    console.log()
-  }
 
 
 
-  oonLogin(): void {
+
+  onLogin(): void {
 
     if (this.searchForm.valid) {
 
       this.isLoading = true;
       const cedula = this.searchForm.value.cedula;
+      this.auth.login(cedula).subscribe(
+        (response) => {
+          this.isLoading = false;
+          if (response.success) {
+            this.usuarios = response.data;
 
-      setTimeout(() => {
-        this.auth.verificarCedula(cedula).subscribe(
-          (response) => {
-            this.isLoading = false;
-            if (response.success) {
-              this.usuarios = response.data;
-
-              const usuarioString = JSON.stringify(this.usuarios);
+            const usuarioString = JSON.stringify(this.usuarios);
 
 
-              localStorage.setItem('usuario', usuarioString);
-              this.router.navigate(['/home']);
+            localStorage.setItem('usuario', usuarioString);
+            this.router.navigate(['/home']);
 
-            } else {
-              this.isLoadingRegister = true;
-              console.log(response.message);
-
-            }
-          },
-          (error) => {
-            console.log('mi cedula', cedula)
-            this.ucedula = cedula;
+          } else {
             this.isLoadingRegister = true;
-            this.isLoading = false;
-         
+            console.log(response.message);
+
           }
-        );
-      }, 700);
+        },
+        (error) => {
+          console.log('mi cedula', cedula)
+          this.ucedula = cedula;
+          this.isLoadingRegister = true;
+          this.isLoading = false;
+
+        }
+      );
+     
     }
   }
 
+  get cargando(): boolean {
+    return this.auth.$loading();
+  }
 
+  get cargandoCrearUser(): boolean {
+    return this.userServices.$loading();
+  }
 
 
   // onLogin(): void {
@@ -397,6 +413,16 @@ export class LoginComponent {
   //     console.log('Datos no encontrado')
   //   }
   // }
+
+
+
+  // registerValide = new FormGroup({
+  //   ucedula: new FormControl('', [Validators.required, this.telefonoValidator.bind(this)]),
+  //   unombres: new FormControl('', [Validators.required]),
+  //   uapellidos: new FormControl('', [Validators.required]),
+  //   ucorreo: new FormControl('', [Validators.required, Validators.email]),
+  // })
+
 
 
 }
